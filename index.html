@@ -213,8 +213,8 @@
             };
 
             const submitToGoogleSheets = async (resultData) => {
-                // ★https://aquamarine-pudding-bd2a4d.netlify.app/
-                const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx_KB9EPgy_tLj_iLmQQVhjcZ-5McoxvTxgzuSVJHRY0oUklu11gl5aku7UUxZIoui7ng/exec';
+                // https://script.google.com/macros/s/AKfycbx_KB9EPgy_tLj_iLmQQVhjcZ-5McoxvTxgzuSVJHRY0oUklu11gl5aku7UUxZIoui7ng/exec
+                const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID_HERE/exec';
                 
                 try {
                     const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
@@ -247,6 +247,7 @@
                     percentage: percentage,
                     sectionScores: sectionScores,
                     answers: answers,
+                    timeLeft: timeLeft,
                     completedAt: new Date().toISOString()
                 };
                 
@@ -362,26 +363,6 @@
                                             </div>
                                         ))}
                                     </div>
-                                </div>
-                            </div>
-
-                            <div className="bg-gray-50 rounded-xl p-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">解答・解説</h3>
-                                <div className="space-y-4 max-h-64 overflow-y-auto">
-                                    {questions.map((q, index) => (
-                                        <div key={index} className="border-l-4 border-gray-300 pl-4">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <span className="text-sm font-medium text-gray-600">
-                                                    問題 {index + 1} ({sections[q.section].name})
-                                                </span>
-                                                <span className={`w-4 h-4 rounded-full ${answers[index] === q.correct ? 'bg-green-600' : 'bg-red-600'}`}></span>
-                                            </div>
-                                            <div className="text-sm text-gray-700 mb-1">
-                                                正解: {q.options[q.correct]}
-                                            </div>
-                                            <div className="text-sm text-gray-600">{q.explanation}</div>
-                                        </div>
-                                    ))}
                                 </div>
                             </div>
 
