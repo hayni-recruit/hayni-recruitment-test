@@ -27,6 +27,7 @@
             const [testStarted, setTestStarted] = useState(false);
             const [testCompleted, setTestCompleted] = useState(false);
             const [showResults, setShowResults] = useState(false);
+            const [isSubmitting, setIsSubmitting] = useState(false);
             const [candidateInfo, setCandidateInfo] = useState({
                 name: '',
                 email: ''
@@ -191,11 +192,6 @@
                 }
             };
 
-            const handleTestComplete = () => {
-                setTestCompleted(true);
-                setShowResults(true);
-            };
-
             const calculateScore = () => {
                 let correct = 0;
                 questions.forEach((q, index) => {
@@ -214,6 +210,52 @@
                     }
                 });
                 return sectionScores;
+            };
+
+            const submitToGoogleSheets = async (resultData) => {
+                // https://script.google.com/macros/s/AKfycbxP2fax8ofw2_1DUoF7Ab0PLiKsdHjwl3x-N78018jEtjP_xjBdCC3dti6iiB4Z9Y0mAQ/exec
+                const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID_HERE/exec';
+                
+                try {
+                    const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(resultData),
+                        mode: 'no-cors' // Google Apps Script用の設定
+                    });
+                    
+                    console.log('データがスプレッドシートに保存され、メールが送信されました');
+                } catch (error) {
+                    console.error('送信エラー:', error);
+                }
+            };
+
+            const handleTestComplete = async () => {
+                setTestCompleted(true);
+                setIsSubmitting(true);
+                
+                const score = calculateScore();
+                const sectionScores = getScoreBySection();
+                const percentage = Math.round((score / questions.length) * 100);
+                
+                // 結果データを準備
+                const resultData = {
+                    name: candidateInfo.name,
+                    email: candidateInfo.email,
+                    score: score,
+                    percentage: percentage,
+                    sectionScores: sectionScores,
+                    answers: answers,
+                    completedAt: new Date().toISOString()
+                };
+                
+                // Google Sheetsに送信
+                await submitToGoogleSheets(resultData);
+                
+                setIsSubmitting(false);
+                setShowResults(true);
             };
 
             const startTest = () => {
@@ -293,6 +335,9 @@
                                 </div>
                                 <h1 className="text-3xl font-bold text-gray-900 mb-2">テスト完了</h1>
                                 <p className="text-gray-600">{candidateInfo.name}様、お疲れ様でした</p>
+                                {isSubmitting && (
+                                    <p className="text-blue-600 text-sm mt-2">結果を保存中...</p>
+                                )}
                             </div>
 
                             <div className="grid md:grid-cols-2 gap-6 mb-8">
@@ -406,56 +451,3 @@
                                                 type="radio"
                                                 name={`question-${currentQuestion}`}
                                                 value={index}
-                                                checked={answers[currentQuestion] === index}
-                                                onChange={() => handleAnswerSelect(index)}
-                                                className="w-5 h-5 text-indigo-600 mr-4"
-                                            />
-                                            <span className="text-gray-900">{option}</span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="flex justify-between">
-                                <button
-                                    onClick={handlePrevious}
-                                    disabled={currentQuestion === 0}
-                                    className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    前の問題
-                                </button>
-                                
-                                <button
-                                    onClick={handleNext}
-                                    className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    {currentQuestion === questions.length - 1 ? 'テスト完了' : '次の問題'}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        ReactDOM.render(<HayniRecruitmentTest />, document.getElementById('root'));
-    </script>
-
-    <!-- ▼ここにフォーム追記 -->
-<form name="test-form" method="POST" data-netlify="true">
-  <p>
-    <label>名前: <input type="text" name="name" required></label>
-  </p>
-  <p>
-    <label>メール: <input type="email" name="email" required></label>
-  </p>
-  <p>
-    <label>テストの回答: <textarea name="answer" required></textarea></label>
-  </p>
-  <p>
-    <button type="submit">送信</button>
-  </p>
-</form>
-    
-</body>
-</html>
