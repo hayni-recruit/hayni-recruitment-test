@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAYNI採用テスト - 論理思考テスト</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const HayniRecruitmentTest = () => {
+            const [currentSection, setCurrentSection] = useState(0);
+            const [currentQuestion, setCurrentQuestion] = useState(0);
+            const [answers, setAnswers] = useState({});
+            const [timeLeft, setTimeLeft] = useState(15 * 60);
+            const [testStarted, setTestStarted] = useState(false);
+            const [testCompleted, setTestCompleted] = useState(false);
+            const [showResults, setShowResults] = useState(false);
+            const [candidateInfo, setCandidateInfo] = useState({
+                name: '',
+                email: '',
+                phone: ''
+            });
+
+            const sections = [
+                { name: '数列推理', questions: 5 },
+                { name: '図形推理', questions: 5 },
+                { name: '言語推理', questions: 5 }
+            ];
+
+            const questions = [
+                {
+                    section: 0,
+                    question: "次の数列の規則を見つけて、？に入る数字を選んでください。\n2, 4, 8, 16, 32, ?",
+                    options: ["A) 48", "B) 64", "C) 72", "D) 96"],
+                    correct: 1,
+                    explanation: "各数字が前の数字の2倍になっている。32 × 2 = 64"
+                },
+                {
+                    section: 0,
+                    question: "次の数列の規則を見つけて、？に入る数字を選んでください。\n1, 4, 9, 16, 25, ?",
+                    options: ["A) 30", "B) 35", "C) 36", "D) 49"],
+                    correct: 2,
+                    explanation: "平方数の数列：1², 2², 3², 4², 5², 6² = 36"
+                },
+                {
+                    section: 0,
+                    question: "次の数列の規則を見つけて、？に入る数字を選んでください。\n3, 7, 15, 31, 63, ?",
+                    options: ["A) 95", "B) 127", "C) 135", "D) 159"],
+                    correct: 1,
+                    explanation: "各項は前の項×2+1の規則"
+                },
+                {
+                    section: 0,
+                    question: "次の数列の規則を見つけて、？に入る数字を選んでください。\n2, 6, 18, 54, 162, ?",
+                    options: ["A) 324", "B) 486", "C) 648", "D) 972"],
+                    correct: 1,
+                    explanation: "各項は前の項×3：162×3=486"
+                },
+                {
+                    section: 0,
+                    question: "次の数列の規則を見つけて、？に入る数字を選んでください。\n1, 1, 2, 3, 5, 8, 13, ?",
+                    options: ["A) 18", "B) 21", "C) 26", "D) 34"],
+                    correct: 1,
+                    explanation: "フィボナッチ数列：各項は前の2項の和。8+13=21"
+                },
+                {
+                    section: 1,
+                    question: "次の図形の変化パターンを見つけて、？に入る図形を選んでください。\n○ → ● → ○ → ● → ?",
+                    options: ["A) ○", "B) ●", "C) △", "D) ■"],
+                    correct: 0,
+                    explanation: "白丸と黒丸が交互に現れるパターン"
+                },
+                {
+                    section: 1,
+                    question: "次の図形の変化パターンを見つけて、？に入る図形を選んでください。\n△ → ◇ → ○ → □ → ?",
+                    options: ["A) △", "B) ◇", "C) ○", "D) ☆"],
+                    correct: 0,
+                    explanation: "4つの図形が順番に繰り返されるサイクル"
+                },
+                {
+                    section: 1,
+                    question: "次の図形の回転パターンを見つけて、？に入る図形を選んでください。\nL字型の図形が時計回りに90度ずつ回転しています。\nL → 右向きL → 逆L → 左向きL → ?",
+                    options: ["A) L", "B) 右向きL", "C) 逆L", "D) 左向きL"],
+                    correct: 0,
+                    explanation: "時計回りに90度ずつ回転して元のLに戻る"
+                },
+                {
+                    section: 1,
+                    question: "次の図形群の中で、他と異なる特徴を持つものを選んでください。",
+                    options: ["A) 正方形", "B) 円", "C) 三角形", "D) ひし形", "E) 星形"],
+                    correct: 4,
+                    explanation: "他はすべて凸図形だが、星形のみ凹図形（へこみがある）"
+                },
+                {
+                    section: 1,
+                    question: "立方体を展開した図が次のようになっています。この立方体で、「1」の面と向かい合う面の数字は？\n\n    [2]\n[4][1][3]\n    [5]\n    [6]",
+                    options: ["A) 2", "B) 3", "C) 5", "D) 6"],
+                    correct: 3,
+                    explanation: "立方体の十字型展開図では、中心から上下・左右・前後が対面関係"
+                },
+                {
+                    section: 2,
+                    question: "次の文章を読んで、論理的に正しい結論を選んでください。\n「すべての鳥は翼を持つ。ペンギンは鳥である。」\nこの前提から導かれる結論は？",
+                    options: ["A) ペンギンは飛ぶことができる", "B) ペンギンは翼を持つ", "C) ペンギンは哺乳類である", "D) 翼を持つものはすべて鳥である"],
+                    correct: 1,
+                    explanation: "三段論法による論理的帰結"
+                },
+                {
+                    section: 2,
+                    question: "次の文章の論理構造を分析してください。\n「売上が伸びない原因は、商品力の低下か、営業力の不足のどちらかである。商品力に問題はないことが判明した。」\nこの前提から導かれる結論は？",
+                    options: ["A) 売上は伸びている", "B) 営業力に問題がある", "C) 商品力と営業力の両方に問題がある", "D) 原因は他にある"],
+                    correct: 1,
+                    explanation: "選言的推論：AまたはB、Aでない、したがってB"
+                },
+                {
+                    section: 2,
+                    question: "次の文章の矛盾を指摘してください。\n「当社の新商品は、すべての顧客に満足していただけます。ただし、一部のお客様にはご満足いただけない場合もあります。」\nこの文章の問題点は？",
+                    options: ["A) 情報が不足している", "B) 論理的に矛盾している", "C) 表現が曖昧である", "D) 根拠が示されていない"],
+                    correct: 1,
+                    explanation: "「すべて満足」と「一部は満足できない」は両立不可能"
+                },
+                {
+                    section: 2,
+                    question: "次の推論の妥当性を評価してください。\n「優秀な営業担当者は売上目標を達成する。田中さんは売上目標を達成した。したがって、田中さんは優秀な営業担当者である。」\nこの推論について正しい評価は？",
+                    options: ["A) 論理的に妥当である", "B) 論理的に無効である（後件肯定の誤謬）", "C) 前提が不十分である", "D) 結論が曖昧である"],
+                    correct: 1,
+                    explanation: "売上達成の理由は優秀さ以外にもあり得るため"
+                },
+                {
+                    section: 2,
+                    question: "次の複雑な論理問題を解いてください。\n「会議室Aは月曜日か水曜日に使用される。会議室Bは火曜日または木曜日に使用される。今週、会議室Aが水曜日に使用されず、会議室Bが火曜日に使用された。」\nこの情報から確実に言えることは？",
+                    options: ["A) 会議室Aは月曜日に使用された", "B) 会議室Bは木曜日に使用されなかった", "C) 両方の会議室が同じ日に使用された", "D) 上記のすべて"],
+                    correct: 0,
+                    explanation: "選言除去により、水曜日でなければ必ず月曜日"
+                }
+            ];
+
+            useEffect(() => {
+                if (testStarted && timeLeft > 0 && !testCompleted) {
+                    const timer = setTimeout(() => {
+                        setTimeLeft(timeLeft - 1);
+                    }, 1000);
+                    return () => clearTimeout(timer);
+                } else if (timeLeft === 0 && !testCompleted) {
+                    handleTestComplete();
+                }
+            }, [testStarted, timeLeft, testCompleted]);
+
+            const formatTime = (seconds) => {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            };
+
+            const handleAnswerSelect = (answerIndex) => {
+                const questionId = currentQuestion;
+                setAnswers(prev => ({
+                    ...prev,
+                    [questionId]: answerIndex
+                }));
+            };
+
+            const handleNext = () => {
+                if (currentQuestion < questions.length - 1) {
+                    setCurrentQuestion(currentQuestion + 1);
+                    if (questions[currentQuestion + 1].section !== currentSection) {
+                        setCurrentSection(questions[currentQuestion + 1].section);
+                    }
+                } else {
+                    handleTestComplete();
+                }
+            };
+
+            const handlePrevious = () => {
+                if (currentQuestion > 0) {
+                    setCurrentQuestion(currentQuestion - 1);
+                    if (questions[currentQuestion - 1].section !== currentSection) {
+                        setCurrentSection(questions[currentQuestion - 1].section);
+                    }
+                }
+            };
+
+            const handleTestComplete = () => {
+                setTestCompleted(true);
+                setShowResults(true);
+            };
+
+            const calculateScore = () => {
+                let correct = 0;
+                questions.forEach((q, index) => {
+                    if (answers[index] === q.correct) {
+                        correct++;
+                    }
+                });
+                return correct;
+            };
+
+            const getScoreBySection = () => {
+                const sectionScores = [0, 0, 0];
+                questions.forEach((q, index) => {
+                    if (answers[index] === q.correct) {
+                        sectionScores[q.section]++;
+                    }
+                });
+                return sectionScores;
+            };
+
+            const startTest = () => {
+                if (candidateInfo.name && candidateInfo.email) {
+                    setTestStarted(true);
+                }
+            };
+
+            if (!testStarted) {
+                return (
+                    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-2xl fade-in">
+                            <div className="text-center mb-8">
+                                <div className="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <span className="text-white text-2xl font-bold">H</span>
+                                </div>
+                                <h1 className="text-3xl font-bold text-gray-900 mb-2">HAYNI採用テスト</h1>
+                                <h2 className="text-xl font-semibold text-indigo-600 mb-4">論理思考テスト</h2>
+                                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800">
+                                    <p className="font-semibold mb-2">📋 テスト概要</p>
+                                    <p>• 制限時間：15分</p>
+                                    <p>• 全15問（各分野5問ずつ）</p>
+                                    <p>• 数列推理・図形推理・言語推理</p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        お名前 *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                        value={candidateInfo.name}
+                                        onChange={(e) => setCandidateInfo({...candidateInfo, name: e.target.value})}
+                                        placeholder="山田太郎"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        メールアドレス *
+                                    </label>
+                                    <input
+                                        type="email"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                        value={candidateInfo.email}
+                                        onChange={(e) => setCandidateInfo({...candidateInfo, email: e.target.value})}
+                                        placeholder="example@email.com"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        電話番号
+                                    </label>
+                                    <input
+                                        type="tel"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                        value={candidateInfo.phone}
+                                        onChange={(e) => setCandidateInfo({...candidateInfo, phone: e.target.value})}
+                                        placeholder="090-1234-5678"
+                                    />
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={startTest}
+                                disabled={!candidateInfo.name || !candidateInfo.email}
+                                className="w-full mt-6 bg-indigo-600 text-white py-3 px-6 rounded-lg hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed font-semibold transition-colors"
+                            >
+                                テストを開始する
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (showResults) {
+                const score = calculateScore();
+                const sectionScores = getScoreBySection();
+                const percentage = Math.round((score / questions.length) * 100);
+
+                return (
+                    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-4xl fade-in">
+                            <div className="text-center mb-8">
+                                <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <span className="text-white text-2xl">✓</span>
+                                </div>
+                                <h1 className="text-3xl font-bold text-gray-900 mb-2">テスト完了</h1>
+                                <p className="text-gray-600">{candidateInfo.name}様、お疲れ様でした</p>
+                            </div>
+
+                            <div className="grid md:grid-cols-2 gap-6 mb-8">
+                                <div className="bg-blue-50 rounded-xl p-6">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h3 className="text-lg font-semibold text-gray-900">総合結果</h3>
+                                        <div className="w-6 h-6 bg-blue-600 rounded"></div>
+                                    </div>
+                                    <div className="text-center">
+                                        <div className="text-4xl font-bold text-blue-600 mb-2">{score}/15</div>
+                                        <div className="text-2xl font-semibold text-gray-700">{percentage}%</div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-gray-50 rounded-xl p-6">
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-4">分野別結果</h3>
+                                    <div className="space-y-3">
+                                        {sections.map((section, index) => (
+                                            <div key={index} className="flex justify-between items-center">
+                                                <span className="text-gray-700">{section.name}</span>
+                                                <span className="font-semibold">
+                                                    {sectionScores[index]}/{section.questions}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-gray-50 rounded-xl p-6">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-4">解答・解説</h3>
+                                <div className="space-y-4 max-h-64 overflow-y-auto">
+                                    {questions.map((q, index) => (
+                                        <div key={index} className="border-l-4 border-gray-300 pl-4">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <span className="text-sm font-medium text-gray-600">
+                                                    問題 {index + 1} ({sections[q.section].name})
+                                                </span>
+                                                <span className={`w-4 h-4 rounded-full ${answers[index] === q.correct ? 'bg-green-600' : 'bg-red-600'}`}></span>
+                                            </div>
+                                            <div className="text-sm text-gray-700 mb-1">
+                                                正解: {q.options[q.correct]}
+                                            </div>
+                                            <div className="text-sm text-gray-600">{q.explanation}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="text-center mt-6">
+                                <p className="text-gray-600 text-sm">
+                                    結果は採用担当者へ自動送信されました。<br />
+                                    今後の選考についてはメールでご連絡いたします。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            const currentQ = questions[currentQuestion];
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 fade-in">
+                    <div className="sticky top-0 bg-white shadow-sm border-b z-10">
+                        <div className="max-w-4xl mx-auto px-4 py-4">
+                            <div className="flex justify-between items-center mb-4">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-5 h-5 bg-gray-600 rounded-full"></div>
+                                    <span className="font-medium text-gray-900">{candidateInfo.name}</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-red-600">
+                                    <div className="w-5 h-5 border-2 border-red-600 rounded-full flex items-center justify-center">
+                                        <div className="w-1 h-3 bg-red-600"></div>
+                                    </div>
+                                    <span className="font-mono font-bold text-lg">{formatTime(timeLeft)}</span>
+                                </div>
+                            </div>
+                            <div className="flex justify-between items-center text-sm text-gray-600 mb-2">
+                                <span>問題 {currentQuestion + 1} / {questions.length}</span>
+                                <span>{sections[currentSection].name}</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div 
+                                    className="bg-indigo-600 h-2 rounded-full transition-all duration-300" 
+                                    style={{ width: `${progress}%` }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="max-w-4xl mx-auto px-4 py-8">
+                        <div className="bg-white rounded-2xl shadow-lg p-8">
+                            <div className="mb-8">
+                                <h2 className="text-xl font-semibold text-gray-900 mb-4 whitespace-pre-line">
+                                    {currentQ.question}
+                                </h2>
+                                
+                                <div className="space-y-3">
+                                    {currentQ.options.map((option, index) => (
+                                        <label
+                                            key={index}
+                                            className={`flex items-center p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                                                answers[currentQuestion] === index
+                                                    ? 'border-indigo-500 bg-indigo-50'
+                                                    : 'border-gray-200 hover:border-gray-300'
+                                            }`}
+                                        >
+                                            <input
+                                                type="radio"
+                                                name={`question-${currentQuestion}`}
+                                                value={index}
+                                                checked={answers[currentQuestion] === index}
+                                                onChange={() => handleAnswerSelect(index)}
+                                                className="w-5 h-5 text-indigo-600 mr-4"
+                                            />
+                                            <span className="text-gray-900">{option}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="flex justify-between">
+                                <button
+                                    onClick={handlePrevious}
+                                    disabled={currentQuestion === 0}
+                                    className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    前の問題
+                                </button>
+                                
+                                <button
+                                    onClick={handleNext}
+                                    className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {currentQuestion === questions.length - 1 ? 'テスト完了' : '次の問題'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<HayniRecruitmentTest />, document.getElementById('root'));
+    </script>
+</body>
+</html>
