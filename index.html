@@ -453,5 +453,22 @@
 
         ReactDOM.render(<HayniRecruitmentTest />, document.getElementById('root'));
     </script>
+
+    <!-- ▼ここにフォーム追記 -->
+<form name="test-form" method="POST" data-netlify="true">
+  <p>
+    <label>名前: <input type="text" name="name" required></label>
+  </p>
+  <p>
+    <label>メール: <input type="email" name="email" required></label>
+  </p>
+  <p>
+    <label>テストの回答: <textarea name="answer" required></textarea></label>
+  </p>
+  <p>
+    <button type="submit">送信</button>
+  </p>
+</form>
+    
 </body>
 </html>
