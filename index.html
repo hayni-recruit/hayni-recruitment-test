@@ -213,7 +213,7 @@
             };
 
             const submitToGoogleSheets = async (resultData) => {
-                // https://script.google.com/macros/s/AKfycbxP2fax8ofw2_1DUoF7Ab0PLiKsdHjwl3x-N78018jEtjP_xjBdCC3dti6iiB4Z9Y0mAQ/exec
+                // ★ここにGoogle Apps ScriptのWebアプリURLを入力してください
                 const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID_HERE/exec';
                 
                 try {
@@ -223,7 +223,7 @@
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify(resultData),
-                        mode: 'no-cors' // Google Apps Script用の設定
+                        mode: 'no-cors'
                     });
                     
                     console.log('データがスプレッドシートに保存され、メールが送信されました');
@@ -240,7 +240,6 @@
                 const sectionScores = getScoreBySection();
                 const percentage = Math.round((score / questions.length) * 100);
                 
-                // 結果データを準備
                 const resultData = {
                     name: candidateInfo.name,
                     email: candidateInfo.email,
@@ -251,7 +250,6 @@
                     completedAt: new Date().toISOString()
                 };
                 
-                // Google Sheetsに送信
                 await submitToGoogleSheets(resultData);
                 
                 setIsSubmitting(false);
@@ -451,3 +449,39 @@
                                                 type="radio"
                                                 name={`question-${currentQuestion}`}
                                                 value={index}
+                                                checked={answers[currentQuestion] === index}
+                                                onChange={() => handleAnswerSelect(index)}
+                                                className="w-5 h-5 text-indigo-600 mr-4"
+                                            />
+                                            <span className="text-gray-900">{option}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="flex justify-between">
+                                <button
+                                    onClick={handlePrevious}
+                                    disabled={currentQuestion === 0}
+                                    className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    前の問題
+                                </button>
+                                
+                                <button
+                                    onClick={handleNext}
+                                    className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {currentQuestion === questions.length - 1 ? 'テスト完了' : '次の問題'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<HayniRecruitmentTest />, document.getElementById('root'));
+    </script>
+</body>
+</html>
