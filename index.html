@@ -105,7 +105,7 @@
                 },
                 {
                     section: 1,
-                    question: "立方体を展開した図が次のようになっています。この立方体で、「1」の面と向かい合う面の数字は？\n\n  　  [2]\n[4][1][3]\n  　  [5]\n 　   [6]",
+                    question: "立方体を展開した図が次のようになっています。この立方体で、「1」の面と向かい合う面の数字は？\n\n　　[2]\n [4][1][3]\n　　[5]\n　　[6]",
                     options: ["A) 2", "B) 3", "C) 5", "D) 6"],
                     correct: 3,
                     explanation: "立方体の十字型展開図では、中心から上下・左右・前後が対面関係"
@@ -213,10 +213,19 @@
             };
 
             const submitToGoogleSheets = async (resultData) => {
-const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz1XN8CziXI8C4ZqENleiLLvC-6O_9zP2UtlEeX-l9MIxv9dOFOC_wFOdPJsPkvdQ5j/exec';
+                const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz1XN8CziXI8C4ZqENleiLLvC-6O_9zP2UtlEeX-l9MIxv9dOFOC_wFOdPJsPkvdQ5j';
 
-                
+                // 重複送信防止
+                const submissionKey = `${resultData.email}_${resultData.completedAt}`;
+                if (sessionStorage.getItem(submissionKey)) {
+                    console.log('既に送信済みです');
+                    return;
+                }
+
                 try {
+                    sessionStorage.setItem(submissionKey, 'submitted');
+                    console.log('送信開始:', submissionKey);
+                    
                     const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
                         method: 'POST',
                         headers: {
@@ -229,32 +238,47 @@ const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz1XN8Cz
                     console.log('データがスプレッドシートに保存され、メールが送信されました');
                 } catch (error) {
                     console.error('送信エラー:', error);
+                    sessionStorage.removeItem(submissionKey);
+                    throw error;
                 }
             };
 
             const handleTestComplete = async () => {
+                // 既に処理中または完了している場合は何もしない
+                if (testCompleted || isSubmitting) {
+                    console.log('既に処理中または完了済みです');
+                    return;
+                }
+                
                 setTestCompleted(true);
                 setIsSubmitting(true);
                 
-                const score = calculateScore();
-                const sectionScores = getScoreBySection();
-                const percentage = Math.round((score / questions.length) * 100);
-                
-                const resultData = {
-                    name: candidateInfo.name,
-                    email: candidateInfo.email,
-                    score: score,
-                    percentage: percentage,
-                    sectionScores: sectionScores,
-                    answers: answers,
-                    timeLeft: timeLeft,
-                    completedAt: new Date().toISOString()
-                };
-                
-                await submitToGoogleSheets(resultData);
-                
-                setIsSubmitting(false);
-                setShowResults(true);
+                try {
+                    const score = calculateScore();
+                    const sectionScores = getScoreBySection();
+                    const percentage = Math.round((score / questions.length) * 100);
+                    
+                    const resultData = {
+                        name: candidateInfo.name,
+                        email: candidateInfo.email,
+                        score: score,
+                        percentage: percentage,
+                        sectionScores: sectionScores,
+                        answers: answers,
+                        timeLeft: timeLeft,
+                        completedAt: new Date().toISOString()
+                    };
+                    
+                    await submitToGoogleSheets(resultData);
+                    setShowResults(true);
+                    
+                } catch (error) {
+                    console.error('テスト完了処理でエラー:', error);
+                    setTestCompleted(false);
+                    alert('送信に失敗しました。もう一度お試しください。');
+                } finally {
+                    setIsSubmitting(false);
+                }
             };
 
             const startTest = () => {
