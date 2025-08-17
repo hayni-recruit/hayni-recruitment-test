@@ -105,7 +105,8 @@
                 },
                 {
                     section: 1,
-question: "立方体を展開した図が次のようになっています。この立方体で、「1」の面と向かい合う面の数字は？\n\n　　[2]\n   [4][1][3]\n　　[5]\n　　[6]",                    options: ["A) 2", "B) 3", "C) 5", "D) 6"],
+                    question: "立方体を展開した図が次のようになっています。この立方体で、「1」の面と向かい合う面の数字は？\n\n　　[2]\n [4][1][3]\n　　[5]\n　　[6]",
+                    options: ["A) 2", "B) 3", "C) 5", "D) 6"],
                     correct: 3,
                     explanation: "立方体の十字型展開図では、中心から上下・左右・前後が対面関係"
                 },
@@ -212,7 +213,7 @@ question: "立方体を展開した図が次のようになっています。こ
             };
 
             const submitToGoogleSheets = async (resultData) => {
-                const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz1XN8CziXI8C4ZqENleiLLvC-6O_9zP2UtlEeX-l9MIxv9dOFOC_wFOdPJsPkvdQ5j';
+                const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz1XN8CziXI8C4ZqENleiLLvC-6O_9zP2UtlEeX-l9MIxv9dOFOC_wFOdPJsPkvdQ5j/exec';
 
                 // 重複送信防止
                 const submissionKey = `${resultData.email}_${resultData.completedAt}`;
@@ -224,21 +225,46 @@ question: "立方体を展開した図が次のようになっています。こ
                 try {
                     sessionStorage.setItem(submissionKey, 'submitted');
                     console.log('送信開始:', submissionKey);
+                    console.log('送信データ:', JSON.stringify(resultData, null, 2));
                     
                     const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json',
+                            'Content-Type': 'text/plain',
                         },
-                        body: JSON.stringify(resultData),
-                        mode: 'no-cors'
+                        body: JSON.stringify(resultData)
                     });
                     
-                    console.log('データがスプレッドシートに保存され、メールが送信されました');
+                    console.log('レスポンス状態:', response.status);
+                    
+                    if (response.ok) {
+                        const responseText = await response.text();
+                        console.log('レスポンス内容:', responseText);
+                        console.log('データがスプレッドシートに保存され、メールが送信されました');
+                    } else {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
                 } catch (error) {
                     console.error('送信エラー:', error);
                     sessionStorage.removeItem(submissionKey);
-                    throw error;
+                    
+                    // フォールバック: 別の方法で送信を試行
+                    try {
+                        console.log('フォールバック送信を試行...');
+                        await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                            method: 'POST',
+                            mode: 'no-cors',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(resultData)
+                        });
+                        console.log('フォールバック送信完了');
+                    } catch (fallbackError) {
+                        console.error('フォールバック送信も失敗:', fallbackError);
+                        throw error;
+                    }
                 }
             };
 
