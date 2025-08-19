@@ -1,0 +1,528 @@
+{\rtf1\ansi\ansicpg932\cocoartf2822
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 <!DOCTYPE html>\
+<html lang="ja">\
+<head>\
+    <meta charset="UTF-8">\
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">\
+    <title>HAYNI\uc0\u25505 \u29992 \u12486 \u12473 \u12488 \u65288 \u12525 \u12472 \u29992 \u65289  - \u35542 \u29702 \u24605 \u32771 \u12486 \u12473 \u12488 </title>\
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>\
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>\
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>\
+    <script src="https://cdn.tailwindcss.com"></script>\
+    <style>\
+        .fade-in \{ animation: fadeIn 0.3s ease-in; \}\
+        @keyframes fadeIn \{ from \{ opacity: 0; \} to \{ opacity: 1; \} \}\
+    </style>\
+</head>\
+<body>\
+    <div id="root"></div>\
+    \
+    <script type="text/babel">\
+        const \{ useState, useEffect \} = React;\
+\
+        const HayniRecruitmentTest = () => \{\
+            const [currentSection, setCurrentSection] = useState(0);\
+            const [currentQuestion, setCurrentQuestion] = useState(0);\
+            const [answers, setAnswers] = useState(\{\});\
+            const [timeLeft, setTimeLeft] = useState(15 * 60);\
+            const [testStarted, setTestStarted] = useState(false);\
+            const [testCompleted, setTestCompleted] = useState(false);\
+            const [showResults, setShowResults] = useState(false);\
+            const [isSubmitting, setIsSubmitting] = useState(false);\
+            const [candidateInfo, setCandidateInfo] = useState(\{\
+                name: '',\
+                email: ''\
+            \});\
+\
+            const sections = [\
+                \{ name: '\uc0\u25968 \u21015 \u25512 \u29702 ', questions: 5 \},\
+                \{ name: '\uc0\u22259 \u24418 \u25512 \u29702 ', questions: 5 \},\
+                \{ name: '\uc0\u35328 \u35486 \u25512 \u29702 ', questions: 5 \}\
+            ];\
+\
+            const questions = [\
+                \{\
+                    section: 0,\
+                    question: "\uc0\u27425 \u12398 \u25968 \u21015 \u12398 \u35215 \u21063 \u12434 \u35211 \u12388 \u12369 \u12390 \u12289 \u65311 \u12395 \u20837 \u12427 \u25968 \u23383 \u12434 \u36984 \u12435 \u12391 \u12367 \u12384 \u12373 \u12356 \u12290 \\n2, 4, 8, 16, 32, ?",\
+                    options: ["A) 48", "B) 64", "C) 72", "D) 96"],\
+                    correct: 1,\
+                    explanation: "\uc0\u21508 \u25968 \u23383 \u12364 \u21069 \u12398 \u25968 \u23383 \u12398 2\u20493 \u12395 \u12394 \u12387 \u12390 \u12356 \u12427 \u12290 32 \'d7 2 = 64"\
+                \},\
+                \{\
+                    section: 0,\
+                    question: "\uc0\u27425 \u12398 \u25968 \u21015 \u12398 \u35215 \u21063 \u12434 \u35211 \u12388 \u12369 \u12390 \u12289 \u65311 \u12395 \u20837 \u12427 \u25968 \u23383 \u12434 \u36984 \u12435 \u12391 \u12367 \u12384 \u12373 \u12356 \u12290 \\n1, 4, 9, 16, 25, ?",\
+                    options: ["A) 30", "B) 35", "C) 36", "D) 49"],\
+                    correct: 2,\
+                    explanation: "\uc0\u24179 \u26041 \u25968 \u12398 \u25968 \u21015 \u65306 1\'b2, 2\'b2, 3\'b2, 4\'b2, 5\'b2, 6\'b2 = 36"\
+                \},\
+                \{\
+                    section: 0,\
+                    question: "\uc0\u27425 \u12398 \u25968 \u21015 \u12398 \u35215 \u21063 \u12434 \u35211 \u12388 \u12369 \u12390 \u12289 \u65311 \u12395 \u20837 \u12427 \u25968 \u23383 \u12434 \u36984 \u12435 \u12391 \u12367 \u12384 \u12373 \u12356 \u12290 \\n3, 7, 15, 31, 63, ?",\
+                    options: ["A) 95", "B) 127", "C) 135", "D) 159"],\
+                    correct: 1,\
+                    explanation: "\uc0\u21508 \u38917 \u12399 \u21069 \u12398 \u38917 \'d72+1\u12398 \u35215 \u21063 "\
+                \},\
+                \{\
+                    section: 0,\
+                    question: "\uc0\u27425 \u12398 \u25968 \u21015 \u12398 \u35215 \u21063 \u12434 \u35211 \u12388 \u12369 \u12390 \u12289 \u65311 \u12395 \u20837 \u12427 \u25968 \u23383 \u12434 \u36984 \u12435 \u12391 \u12367 \u12384 \u12373 \u12356 \u12290 \\n2, 6, 18, 54, 162, ?",\
+                    options: ["A) 324", "B) 486", "C) 648", "D) 972"],\
+                    correct: 1,\
+                    explanation: "\uc0\u21508 \u38917 \u12399 \u21069 \u12398 \u38917 \'d73\u65306 162\'d73=486"\
+                \},\
+                \{\
+                    section: 0,\
+                    question: "\uc0\u27425 \u12398 \u25968 \u21015 \u12398 \u35215 \u21063 \u12434 \u35211 \u12388 \u12369 \u12390 \u12289 \u65311 \u12395 \u20837 \u12427 \u25968 \u23383 \u12434 \u36984 \u12435 \u12391 \u12367 \u12384 \u12373 \u12356 \u12290 \\n1, 1, 2, 3, 5, 8, 13, ?",\
+                    options: ["A) 18", "B) 21", "C) 26", "D) 34"],\
+                    correct: 1,\
+                    explanation: "\uc0\u12501 \u12451 \u12508 \u12490 \u12483 \u12481 \u25968 \u21015 \u65306 \u21508 \u38917 \u12399 \u21069 \u12398 2\u38917 \u12398 \u21644 \u12290 8+13=21"\
+                \},\
+                \{\
+                    section: 1,\
+                    question: "\uc0\u27425 \u12398 \u22259 \u24418 \u12398 \u22793 \u21270 \u12497 \u12479 \u12540 \u12531 \u12434 \u35211 \u12388 \u12369 \u12390 \u12289 \u65311 \u12395 \u20837 \u12427 \u22259 \u24418 \u12434 \u36984 \u12435 \u12391 \u12367 \u12384 \u12373 \u12356 \u12290 \\n\u9675  \u8594  \u9679  \u8594  \u9675  \u8594  \u9679  \u8594  ?",\
+                    options: ["A) \uc0\u9675 ", "B) \u9679 ", "C) \u9651 ", "D) \u9632 "],\
+                    correct: 0,\
+                    explanation: "\uc0\u30333 \u20024 \u12392 \u40658 \u20024 \u12364 \u20132 \u20114 \u12395 \u29694 \u12428 \u12427 \u12497 \u12479 \u12540 \u12531 "\
+                \},\
+                \{\
+                    section: 1,\
+                    question: "\uc0\u27425 \u12398 \u22259 \u24418 \u12398 \u22793 \u21270 \u12497 \u12479 \u12540 \u12531 \u12434 \u35211 \u12388 \u12369 \u12390 \u12289 \u65311 \u12395 \u20837 \u12427 \u22259 \u24418 \u12434 \u36984 \u12435 \u12391 \u12367 \u12384 \u12373 \u12356 \u12290 \\n\u9651  \u8594  \u9671  \u8594  \u9675  \u8594  \u9633  \u8594  ?",\
+                    options: ["A) \uc0\u9651 ", "B) \u9671 ", "C) \u9675 ", "D) \u9734 "],\
+                    correct: 0,\
+                    explanation: "4\uc0\u12388 \u12398 \u22259 \u24418 \u12364 \u38918 \u30058 \u12395 \u32368 \u12426 \u36820 \u12373 \u12428 \u12427 \u12469 \u12452 \u12463 \u12523 "\
+                \},\
+                \{\
+                    section: 1,\
+                    question: "\uc0\u27425 \u12398 \u22259 \u24418 \u12398 \u22238 \u36578 \u12497 \u12479 \u12540 \u12531 \u12434 \u35211 \u12388 \u12369 \u12390 \u12289 \u65311 \u12395 \u20837 \u12427 \u22259 \u24418 \u12434 \u36984 \u12435 \u12391 \u12367 \u12384 \u12373 \u12356 \u12290 \\nL\u23383 \u22411 \u12398 \u22259 \u24418 \u12364 \u26178 \u35336 \u22238 \u12426 \u12395 90\u24230 \u12378 \u12388 \u22238 \u36578 \u12375 \u12390 \u12356 \u12414 \u12377 \u12290 \\nL \u8594  \u21491 \u21521 \u12365 L \u8594  \u36870 L \u8594  \u24038 \u21521 \u12365 L \u8594  ?",\
+                    options: ["A) L", "B) \uc0\u21491 \u21521 \u12365 L", "C) \u36870 L", "D) \u24038 \u21521 \u12365 L"],\
+                    correct: 0,\
+                    explanation: "\uc0\u26178 \u35336 \u22238 \u12426 \u12395 90\u24230 \u12378 \u12388 \u22238 \u36578 \u12375 \u12390 \u20803 \u12398 L\u12395 \u25147 \u12427 "\
+                \},\
+                \{\
+                    section: 1,\
+                    question: "\uc0\u27425 \u12398 \u22259 \u24418 \u32676 \u12398 \u20013 \u12391 \u12289 \u20182 \u12392 \u30064 \u12394 \u12427 \u29305 \u24500 \u12434 \u25345 \u12388 \u12418 \u12398 \u12434 \u36984 \u12435 \u12391 \u12367 \u12384 \u12373 \u12356 \u12290 ",\
+                    options: ["A) \uc0\u27491 \u26041 \u24418 ", "B) \u20870 ", "C) \u19977 \u35282 \u24418 ", "D) \u12402 \u12375 \u24418 ", "E) \u26143 \u24418 "],\
+                    correct: 4,\
+                    explanation: "\uc0\u20182 \u12399 \u12377 \u12409 \u12390 \u20984 \u22259 \u24418 \u12384 \u12364 \u12289 \u26143 \u24418 \u12398 \u12415 \u20985 \u22259 \u24418 \u65288 \u12408 \u12371 \u12415 \u12364 \u12354 \u12427 \u65289 "\
+                \},\
+                \{\
+                    section: 1,\
+                    question: "\uc0\u31435 \u26041 \u20307 \u12434 \u23637 \u38283 \u12375 \u12383 \u22259 \u12364 \u27425 \u12398 \u12424 \u12358 \u12395 \u12394 \u12387 \u12390 \u12356 \u12414 \u12377 \u12290 \u12371 \u12398 \u31435 \u26041 \u20307 \u12391 \u12289 \u12300 1\u12301 \u12398 \u38754 \u12392 \u21521 \u12363 \u12356 \u21512 \u12358 \u38754 \u12398 \u25968 \u23383 \u12399 \u65311 \u8251 \u32294 \u12395 2,1,5,6\u12364 \u20006 \u12403 \u12414 \u12377 \u12290 \\n\\n\u12288 \u12288 [2]\\n [4][1][3]\\n\u12288 \u12288 [5]\\n\u12288 \u12288 [6]",\
+                    options: ["A) 2", "B) 3", "C) 5", "D) 6"],\
+                    correct: 3,\
+                    explanation: "\uc0\u31435 \u26041 \u20307 \u12398 \u21313 \u23383 \u22411 \u23637 \u38283 \u22259 \u12391 \u12399 \u12289 \u20013 \u24515 \u12363 \u12425 \u19978 \u19979 \u12539 \u24038 \u21491 \u12539 \u21069 \u24460 \u12364 \u23550 \u38754 \u38306 \u20418 "\
+                \},\
+                \{\
+                    section: 2,\
+                    question: "\uc0\u27425 \u12398 \u25991 \u31456 \u12434 \u35501 \u12435 \u12391 \u12289 \u35542 \u29702 \u30340 \u12395 \u27491 \u12375 \u12356 \u32080 \u35542 \u12434 \u36984 \u12435 \u12391 \u12367 \u12384 \u12373 \u12356 \u12290 \\n\u12300 \u12377 \u12409 \u12390 \u12398 \u40165 \u12399 \u32764 \u12434 \u25345 \u12388 \u12290 \u12506 \u12531 \u12462 \u12531 \u12399 \u40165 \u12391 \u12354 \u12427 \u12290 \u12301 \\n\u12371 \u12398 \u21069 \u25552 \u12363 \u12425 \u23566 \u12363 \u12428 \u12427 \u32080 \u35542 \u12399 \u65311 ",\
+                    options: ["A) \uc0\u12506 \u12531 \u12462 \u12531 \u12399 \u39131 \u12406 \u12371 \u12392 \u12364 \u12391 \u12365 \u12427 ", "B) \u12506 \u12531 \u12462 \u12531 \u12399 \u32764 \u12434 \u25345 \u12388 ", "C) \u12506 \u12531 \u12462 \u12531 \u12399 \u21754 \u20083 \u39006 \u12391 \u12354 \u12427 ", "D) \u32764 \u12434 \u25345 \u12388 \u12418 \u12398 \u12399 \u12377 \u12409 \u12390 \u40165 \u12391 \u12354 \u12427 "],\
+                    correct: 1,\
+                    explanation: "\uc0\u19977 \u27573 \u35542 \u27861 \u12395 \u12424 \u12427 \u35542 \u29702 \u30340 \u24112 \u32080 "\
+                \},\
+                \{\
+                    section: 2,\
+                    question: "\uc0\u27425 \u12398 \u25991 \u31456 \u12398 \u35542 \u29702 \u27083 \u36896 \u12434 \u20998 \u26512 \u12375 \u12390 \u12367 \u12384 \u12373 \u12356 \u12290 \\n\u12300 \u22770 \u19978 \u12364 \u20280 \u12403 \u12394 \u12356 \u21407 \u22240 \u12399 \u12289 \u21830 \u21697 \u21147 \u12398 \u20302 \u19979 \u12363 \u12289 \u21942 \u26989 \u21147 \u12398 \u19981 \u36275 \u12398 \u12393 \u12385 \u12425 \u12363 \u12391 \u12354 \u12427 \u12290 \u21830 \u21697 \u21147 \u12395 \u21839 \u38988 \u12399 \u12394 \u12356 \u12371 \u12392 \u12364 \u21028 \u26126 \u12375 \u12383 \u12290 \u12301 \\n\u12371 \u12398 \u21069 \u25552 \u12363 \u12425 \u23566 \u12363 \u12428 \u12427 \u32080 \u35542 \u12399 \u65311 ",\
+                    options: ["A) \uc0\u22770 \u19978 \u12399 \u20280 \u12403 \u12390 \u12356 \u12427 ", "B) \u21942 \u26989 \u21147 \u12395 \u21839 \u38988 \u12364 \u12354 \u12427 ", "C) \u21830 \u21697 \u21147 \u12392 \u21942 \u26989 \u21147 \u12398 \u20001 \u26041 \u12395 \u21839 \u38988 \u12364 \u12354 \u12427 ", "D) \u21407 \u22240 \u12399 \u20182 \u12395 \u12354 \u12427 "],\
+                    correct: 1,\
+                    explanation: "\uc0\u36984 \u35328 \u30340 \u25512 \u35542 \u65306 A\u12414 \u12383 \u12399 B\u12289 A\u12391 \u12394 \u12356 \u12289 \u12375 \u12383 \u12364 \u12387 \u12390 B"\
+                \},\
+                \{\
+                    section: 2,\
+                    question: "\uc0\u27425 \u12398 \u25991 \u31456 \u12398 \u30683 \u30462 \u12434 \u25351 \u25688 \u12375 \u12390 \u12367 \u12384 \u12373 \u12356 \u12290 \\n\u12300 \u24403 \u31038 \u12398 \u26032 \u21830 \u21697 \u12399 \u12289 \u12377 \u12409 \u12390 \u12398 \u39015 \u23458 \u12395 \u28288 \u36275 \u12375 \u12390 \u12356 \u12383 \u12384 \u12369 \u12414 \u12377 \u12290 \u12383 \u12384 \u12375 \u12289 \u19968 \u37096 \u12398 \u12362 \u23458 \u27096 \u12395 \u12399 \u12372 \u28288 \u36275 \u12356 \u12383 \u12384 \u12369 \u12394 \u12356 \u22580 \u21512 \u12418 \u12354 \u12426 \u12414 \u12377 \u12290 \u12301 \\n\u12371 \u12398 \u25991 \u31456 \u12398 \u21839 \u38988 \u28857 \u12399 \u65311 ",\
+                    options: ["A) \uc0\u24773 \u22577 \u12364 \u19981 \u36275 \u12375 \u12390 \u12356 \u12427 ", "B) \u35542 \u29702 \u30340 \u12395 \u30683 \u30462 \u12375 \u12390 \u12356 \u12427 ", "C) \u34920 \u29694 \u12364 \u26326 \u26151 \u12391 \u12354 \u12427 ", "D) \u26681 \u25312 \u12364 \u31034 \u12373 \u12428 \u12390 \u12356 \u12394 \u12356 "],\
+                    correct: 1,\
+                    explanation: "\uc0\u12300 \u12377 \u12409 \u12390 \u28288 \u36275 \u12301 \u12392 \u12300 \u19968 \u37096 \u12399 \u28288 \u36275 \u12391 \u12365 \u12394 \u12356 \u12301 \u12399 \u20001 \u31435 \u19981 \u21487 \u33021 "\
+                \},\
+                \{\
+                    section: 2,\
+                    question: "\uc0\u27425 \u12398 \u25512 \u35542 \u12398 \u22949 \u24403 \u24615 \u12434 \u35413 \u20385 \u12375 \u12390 \u12367 \u12384 \u12373 \u12356 \u12290 \\n\u12300 \u20778 \u31168 \u12394 \u21942 \u26989 \u25285 \u24403 \u32773 \u12399 \u22770 \u19978 \u30446 \u27161 \u12434 \u36948 \u25104 \u12377 \u12427 \u12290 \u30000 \u20013 \u12373 \u12435 \u12399 \u22770 \u19978 \u30446 \u27161 \u12434 \u36948 \u25104 \u12375 \u12383 \u12290 \u12375 \u12383 \u12364 \u12387 \u12390 \u12289 \u30000 \u20013 \u12373 \u12435 \u12399 \u20778 \u31168 \u12394 \u21942 \u26989 \u25285 \u24403 \u32773 \u12391 \u12354 \u12427 \u12290 \u12301 \\n\u12371 \u12398 \u25512 \u35542 \u12395 \u12388 \u12356 \u12390 \u27491 \u12375 \u12356 \u35413 \u20385 \u12399 \u65311 ",\
+                    options: ["A) \uc0\u35542 \u29702 \u30340 \u12395 \u22949 \u24403 \u12391 \u12354 \u12427 ", "B) \u35542 \u29702 \u30340 \u12395 \u28961 \u21177 \u12391 \u12354 \u12427 \u65288 \u24460 \u20214 \u32943 \u23450 \u12398 \u35492 \u35628 \u65289 ", "C) \u21069 \u25552 \u12364 \u19981 \u21313 \u20998 \u12391 \u12354 \u12427 ", "D) \u32080 \u35542 \u12364 \u26326 \u26151 \u12391 \u12354 \u12427 "],\
+                    correct: 1,\
+                    explanation: "\uc0\u22770 \u19978 \u36948 \u25104 \u12398 \u29702 \u30001 \u12399 \u20778 \u31168 \u12373 \u20197 \u22806 \u12395 \u12418 \u12354 \u12426 \u24471 \u12427 \u12383 \u12417 "\
+                \},\
+                \{\
+                    section: 2,\
+                    question: "\uc0\u27425 \u12398 \u35079 \u38609 \u12394 \u35542 \u29702 \u21839 \u38988 \u12434 \u35299 \u12356 \u12390 \u12367 \u12384 \u12373 \u12356 \u12290 \\n\u12300 \u20250 \u35696 \u23460 A\u12399 \u26376 \u26332 \u26085 \u12363 \u27700 \u26332 \u26085 \u12395 \u20351 \u29992 \u12373 \u12428 \u12427 \u12290 \u20250 \u35696 \u23460 B\u12399 \u28779 \u26332 \u26085 \u12414 \u12383 \u12399 \u26408 \u26332 \u26085 \u12395 \u20351 \u29992 \u12373 \u12428 \u12427 \u12290 \u20170 \u36913 \u12289 \u20250 \u35696 \u23460 A\u12364 \u27700 \u26332 \u26085 \u12395 \u20351 \u29992 \u12373 \u12428 \u12378 \u12289 \u20250 \u35696 \u23460 B\u12364 \u28779 \u26332 \u26085 \u12395 \u20351 \u29992 \u12373 \u12428 \u12383 \u12290 \u12301 \\n\u12371 \u12398 \u24773 \u22577 \u12363 \u12425 \u30906 \u23455 \u12395 \u35328 \u12360 \u12427 \u12371 \u12392 \u12399 \u65311 ",\
+                    options: ["A) \uc0\u20250 \u35696 \u23460 A\u12399 \u26376 \u26332 \u26085 \u12395 \u20351 \u29992 \u12373 \u12428 \u12383 ", "B) \u20250 \u35696 \u23460 B\u12399 \u26408 \u26332 \u26085 \u12395 \u20351 \u29992 \u12373 \u12428 \u12394 \u12363 \u12387 \u12383 ", "C) \u20001 \u26041 \u12398 \u20250 \u35696 \u23460 \u12364 \u21516 \u12376 \u26085 \u12395 \u20351 \u29992 \u12373 \u12428 \u12383 ", "D) \u19978 \u35352 \u12398 \u12377 \u12409 \u12390 "],\
+                    correct: 0,\
+                    explanation: "\uc0\u36984 \u35328 \u38500 \u21435 \u12395 \u12424 \u12426 \u12289 \u27700 \u26332 \u26085 \u12391 \u12394 \u12369 \u12428 \u12400 \u24517 \u12378 \u26376 \u26332 \u26085 "\
+                \}\
+            ];\
+\
+            useEffect(() => \{\
+                if (testStarted && timeLeft > 0 && !testCompleted) \{\
+                    const timer = setTimeout(() => \{\
+                        setTimeLeft(timeLeft - 1);\
+                    \}, 1000);\
+                    return () => clearTimeout(timer);\
+                \} else if (timeLeft === 0 && !testCompleted) \{\
+                    handleTestComplete();\
+                \}\
+            \}, [testStarted, timeLeft, testCompleted]);\
+\
+            const formatTime = (seconds) => \{\
+                const mins = Math.floor(seconds / 60);\
+                const secs = seconds % 60;\
+                return `$\{mins\}:$\{secs.toString().padStart(2, '0')\}`;\
+            \};\
+\
+            const handleAnswerSelect = (answerIndex) => \{\
+                const questionId = currentQuestion;\
+                setAnswers(prev => (\{\
+                    ...prev,\
+                    [questionId]: answerIndex\
+                \}));\
+            \};\
+\
+            const handleNext = () => \{\
+                if (currentQuestion < questions.length - 1) \{\
+                    setCurrentQuestion(currentQuestion + 1);\
+                    if (questions[currentQuestion + 1].section !== currentSection) \{\
+                        setCurrentSection(questions[currentQuestion + 1].section);\
+                    \}\
+                \} else \{\
+                    handleTestComplete();\
+                \}\
+            \};\
+\
+            const handlePrevious = () => \{\
+                if (currentQuestion > 0) \{\
+                    setCurrentQuestion(currentQuestion - 1);\
+                    if (questions[currentQuestion - 1].section !== currentSection) \{\
+                        setCurrentSection(questions[currentQuestion - 1].section);\
+                    \}\
+                \}\
+            \};\
+\
+            const calculateScore = () => \{\
+                let correct = 0;\
+                questions.forEach((q, index) => \{\
+                    if (answers[index] === q.correct) \{\
+                        correct++;\
+                    \}\
+                \});\
+                return correct;\
+            \};\
+\
+            const getScoreBySection = () => \{\
+                const sectionScores = [0, 0, 0];\
+                questions.forEach((q, index) => \{\
+                    if (answers[index] === q.correct) \{\
+                        sectionScores[q.section]++;\
+                    \}\
+                \});\
+                return sectionScores;\
+            \};\
+\
+            const submitToGoogleSheets = async (resultData) => \{\
+                const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz1XN8CziXI8C4ZqENleiLLvC-6O_9zP2UtlEeX-l9MIxv9dOFOC_wFOdPJsPkvdQ5j/exec';\
+\
+                // \uc0\u37325 \u35079 \u36865 \u20449 \u38450 \u27490 \
+                const submissionKey = `$\{resultData.email\}_$\{resultData.completedAt\}`;\
+                if (sessionStorage.getItem(submissionKey)) \{\
+                    console.log('\uc0\u26082 \u12395 \u36865 \u20449 \u28168 \u12415 \u12391 \u12377 ');\
+                    return;\
+                \}\
+\
+                try \{\
+                    sessionStorage.setItem(submissionKey, 'submitted');\
+                    console.log('\uc0\u36865 \u20449 \u38283 \u22987 :', submissionKey);\
+                    console.log('\uc0\u36865 \u20449 \u12487 \u12540 \u12479 :', JSON.stringify(resultData, null, 2));\
+                    \
+                    const response = await fetch(GOOGLE_APPS_SCRIPT_URL, \{\
+                        method: 'POST',\
+                        headers: \{\
+                            'Content-Type': 'text/plain',\
+                        \},\
+                        body: JSON.stringify(resultData)\
+                    \});\
+                    \
+                    console.log('\uc0\u12524 \u12473 \u12509 \u12531 \u12473 \u29366 \u24907 :', response.status);\
+                    \
+                    if (response.ok) \{\
+                        const responseText = await response.text();\
+                        console.log('\uc0\u12524 \u12473 \u12509 \u12531 \u12473 \u20869 \u23481 :', responseText);\
+                        console.log('\uc0\u12487 \u12540 \u12479 \u12364 \u12473 \u12503 \u12524 \u12483 \u12489 \u12471 \u12540 \u12488 \u12395 \u20445 \u23384 \u12373 \u12428 \u12289 \u12513 \u12540 \u12523 \u12364 \u36865 \u20449 \u12373 \u12428 \u12414 \u12375 \u12383 ');\
+                    \} else \{\
+                        throw new Error(`HTTP $\{response.status\}: $\{response.statusText\}`);\
+                    \}\
+                    \
+                \} catch (error) \{\
+                    console.error('\uc0\u36865 \u20449 \u12456 \u12521 \u12540 :', error);\
+                    sessionStorage.removeItem(submissionKey);\
+                    \
+                    // \uc0\u12501 \u12457 \u12540 \u12523 \u12496 \u12483 \u12463 : \u21029 \u12398 \u26041 \u27861 \u12391 \u36865 \u20449 \u12434 \u35430 \u34892 \
+                    try \{\
+                        console.log('\uc0\u12501 \u12457 \u12540 \u12523 \u12496 \u12483 \u12463 \u36865 \u20449 \u12434 \u35430 \u34892 ...');\
+                        await fetch(GOOGLE_APPS_SCRIPT_URL, \{\
+                            method: 'POST',\
+                            mode: 'no-cors',\
+                            headers: \{\
+                                'Content-Type': 'application/json',\
+                            \},\
+                            body: JSON.stringify(resultData)\
+                        \});\
+                        console.log('\uc0\u12501 \u12457 \u12540 \u12523 \u12496 \u12483 \u12463 \u36865 \u20449 \u23436 \u20102 ');\
+                    \} catch (fallbackError) \{\
+                        console.error('\uc0\u12501 \u12457 \u12540 \u12523 \u12496 \u12483 \u12463 \u36865 \u20449 \u12418 \u22833 \u25943 :', fallbackError);\
+                        throw error;\
+                    \}\
+                \}\
+            \};\
+\
+            const handleTestComplete = async () => \{\
+                // \uc0\u26082 \u12395 \u20966 \u29702 \u20013 \u12414 \u12383 \u12399 \u23436 \u20102 \u12375 \u12390 \u12356 \u12427 \u22580 \u21512 \u12399 \u20309 \u12418 \u12375 \u12394 \u12356 \
+                if (testCompleted || isSubmitting) \{\
+                    console.log('\uc0\u26082 \u12395 \u20966 \u29702 \u20013 \u12414 \u12383 \u12399 \u23436 \u20102 \u28168 \u12415 \u12391 \u12377 ');\
+                    return;\
+                \}\
+                \
+                setTestCompleted(true);\
+                setIsSubmitting(true);\
+                \
+                try \{\
+                    const score = calculateScore();\
+                    const sectionScores = getScoreBySection();\
+                    const percentage = Math.round((score / questions.length) * 100);\
+                    \
+                    const resultData = \{\
+                        name: candidateInfo.name,\
+                        email: candidateInfo.email,\
+                        score: score,\
+                        percentage: percentage,\
+                        sectionScores: sectionScores,\
+                        answers: answers,\
+                        timeLeft: timeLeft,\
+                        completedAt: new Date().toISOString()\
+                    \};\
+                    \
+                    await submitToGoogleSheets(resultData);\
+                    setShowResults(true);\
+                    \
+                \} catch (error) \{\
+                    console.error('\uc0\u12486 \u12473 \u12488 \u23436 \u20102 \u20966 \u29702 \u12391 \u12456 \u12521 \u12540 :', error);\
+                    setTestCompleted(false);\
+                    alert('\uc0\u36865 \u20449 \u12395 \u22833 \u25943 \u12375 \u12414 \u12375 \u12383 \u12290 \u12418 \u12358 \u19968 \u24230 \u12362 \u35430 \u12375 \u12367 \u12384 \u12373 \u12356 \u12290 ');\
+                \} finally \{\
+                    setIsSubmitting(false);\
+                \}\
+            \};\
+\
+            const startTest = () => \{\
+                if (candidateInfo.name && candidateInfo.email) \{\
+                    setTestStarted(true);\
+                \}\
+            \};\
+\
+            if (!testStarted) \{\
+                return (\
+                    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">\
+                        <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-2xl fade-in">\
+                            <div className="text-center mb-8">\
+                                <div className="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">\
+                                    <span className="text-white text-2xl font-bold">H</span>\
+                                </div>\
+                                <h1 className="text-3xl font-bold text-gray-900 mb-2">HAYNI\uc0\u25505 \u29992 \u12486 \u12473 \u12488 \u65288 \u12525 \u12472 \u29992 \u65289 </h1>\
+                                <h2 className="text-xl font-semibold text-indigo-600 mb-4">\uc0\u35542 \u29702 \u24605 \u32771 \u12486 \u12473 \u12488 </h2>\
+                                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800">\
+                                    <p className="font-semibold mb-2">\uc0\u55357 \u56523  \u12486 \u12473 \u12488 \u27010 \u35201 </p>\
+                                    <p>\'95 \uc0\u21046 \u38480 \u26178 \u38291 \u65306 15\u20998 </p>\
+                                    <p>\'95 \uc0\u20840 15\u21839 \u65288 \u21508 \u20998 \u37326 5\u21839 \u12378 \u12388 \u65289 </p>\
+                                    <p>\'95 \uc0\u25968 \u21015 \u25512 \u29702 \u12539 \u22259 \u24418 \u25512 \u29702 \u12539 \u35328 \u35486 \u25512 \u29702 </p>\
+                                    <p>\'95 \uc0\u21839 \u38988 \u12399 \u25147 \u12387 \u12390 \u22238 \u31572 \u12377 \u12427 \u12371 \u12392 \u12364 \u21487 \u33021 \u12391 \u12377 </p>\
+                                </div>\
+                            </div>\
+\
+                            <div className="space-y-4">\
+                                <div>\
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">\
+                                        \uc0\u12362 \u21517 \u21069  *\
+                                    </label>\
+                                    <input\
+                                        type="text"\
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"\
+                                        value=\{candidateInfo.name\}\
+                                        onChange=\{(e) => setCandidateInfo(\{...candidateInfo, name: e.target.value\})\}\
+                                        placeholder="\uc0\u23665 \u30000 \u22826 \u37070 "\
+                                    />\
+                                </div>\
+                                <div>\
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">\
+                                        \uc0\u12513 \u12540 \u12523 \u12450 \u12489 \u12524 \u12473  *\
+                                    </label>\
+                                    <input\
+                                        type="email"\
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"\
+                                        value=\{candidateInfo.email\}\
+                                        onChange=\{(e) => setCandidateInfo(\{...candidateInfo, email: e.target.value\})\}\
+                                        placeholder="example@email.com"\
+                                    />\
+                                </div>\
+                            </div>\
+\
+                           <p className="mt-4">\uc0\u8251 \u12372 \u20837 \u21147 \u12356 \u12383 \u12384 \u12356 \u12383 \u20491 \u20154 \u24773 \u22577 \u12399 \u25505 \u29992 \u36984 \u32771 \u12392 \u36899 \u32097 \u12395 \u12398 \u12415 \u21033 \u29992 \u12375 \u12289 \u31532 \u19977 \u32773 \u12408 \u25552 \u20379 \u12356 \u12383 \u12375 \u12414 \u12379 \u12435 \u12290 \u36984 \u32771 \u32066 \u20102 \u24460 \u12289 \u24403 \u31038 \u36012 \u20219 \u12391 \u36969 \u20999 \u12395 \u21066 \u38500 \u12375 \u12414 \u12377 \u12290 </p>\
+\
+                            <button\
+                                onClick=\{startTest\}\
+                                disabled=\{!candidateInfo.name || !candidateInfo.email\}\
+                                className="w-full mt-6 bg-indigo-600 text-white py-3 px-6 rounded-lg hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed font-semibold transition-colors"\
+                            >\
+                                \uc0\u12486 \u12473 \u12488 \u12434 \u38283 \u22987 \u12377 \u12427 \
+                            </button>\
+                        </div>\
+                    </div>\
+                );\
+            \}\
+\
+            if (showResults) \{\
+                const score = calculateScore();\
+                const sectionScores = getScoreBySection();\
+                const percentage = Math.round((score / questions.length) * 100);\
+\
+                return (\
+                    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center p-4">\
+                        <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-4xl fade-in">\
+                            <div className="text-center mb-8">\
+                                <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">\
+                                    <span className="text-white text-2xl">\uc0\u10003 </span>\
+                                </div>\
+                                <h1 className="text-3xl font-bold text-gray-900 mb-2">\uc0\u12486 \u12473 \u12488 \u23436 \u20102 </h1>\
+                                <p className="text-gray-600">\{candidateInfo.name\}\uc0\u27096 \u12289 \u12362 \u30130 \u12428 \u27096 \u12391 \u12375 \u12383 </p>\
+                                \{isSubmitting && (\
+                                    <p className="text-blue-600 text-sm mt-2">\uc0\u32080 \u26524 \u12434 \u20445 \u23384 \u20013 ...</p>\
+                                )\}\
+                            </div>\
+\
+                            <div className="grid md:grid-cols-2 gap-6 mb-8">\
+                                <div className="bg-blue-50 rounded-xl p-6">\
+                                    <div className="flex items-center justify-between mb-4">\
+                                        <h3 className="text-lg font-semibold text-gray-900">\uc0\u32207 \u21512 \u32080 \u26524 </h3>\
+                                        <div className="w-6 h-6 bg-blue-600 rounded"></div>\
+                                    </div>\
+                                    <div className="text-center">\
+                                        <div className="text-4xl font-bold text-blue-600 mb-2">\{score\}/15</div>\
+                                        <div className="text-2xl font-semibold text-gray-700">\{percentage\}%</div>\
+                                    </div>\
+                                </div>\
+\
+                                <div className="bg-gray-50 rounded-xl p-6">\
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-4">\uc0\u20998 \u37326 \u21029 \u32080 \u26524 </h3>\
+                                    <div className="space-y-3">\
+                                        \{sections.map((section, index) => (\
+                                            <div key=\{index\} className="flex justify-between items-center">\
+                                                <span className="text-gray-700">\{section.name\}</span>\
+                                                <span className="font-semibold">\
+                                                    \{sectionScores[index]\}/\{section.questions\}\
+                                                </span>\
+                                            </div>\
+                                        ))\}\
+                                    </div>\
+                                </div>\
+                            </div>\
+\
+                            <div className="text-center mt-6">\
+                                <p className="text-gray-600 text-sm">\
+                                    \uc0\u12372 \u21463 \u35611 \u12356 \u12383 \u12384 \u12365 \u12289 \u12354 \u12426 \u12364 \u12392 \u12358 \u12372 \u12374 \u12356 \u12414 \u12377 \u12290 <br />\
+                                    \uc0\u36984 \u32771 \u12398 \u21512 \u21542 \u12395 \u12388 \u12356 \u12390 \u12399 \u12289 \u65299 \u21942 \u26989 \u26085 \u20197 \u20869 \u12395 \u12372 \u36899 \u32097 \u12356 \u12383 \u12375 \u12414 \u12377 \u12290 <br />\
+                                    \uc0\u8251 \u24773 \u22577 \u28431 \u27945 \u12398 \u12383 \u12417 \u20844 \u24179 \u24615 \u12434 \u37969 \u12415 \u12289 \u35299 \u31572 \u12399 \u20849 \u26377 \u12375 \u12390 \u12362 \u12426 \u12414 \u12379 \u12435 \u12290 \
+                                </p>\
+                            </div>\
+                        </div>\
+                    </div>\
+                );\
+            \}\
+\
+            const currentQ = questions[currentQuestion];\
+            const progress = ((currentQuestion + 1) / questions.length) * 100;\
+\
+            return (\
+                <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 fade-in">\
+                    <div className="sticky top-0 bg-white shadow-sm border-b z-10">\
+                        <div className="max-w-4xl mx-auto px-4 py-4">\
+                            <div className="flex justify-between items-center mb-4">\
+                                <div className="flex items-center gap-4">\
+                                    <div className="w-5 h-5 bg-gray-600 rounded-full"></div>\
+                                    <span className="font-medium text-gray-900">\{candidateInfo.name\}</span>\
+                                </div>\
+                                <div className="flex items-center gap-2 text-red-600">\
+                                    <div className="w-5 h-5 border-2 border-red-600 rounded-full flex items-center justify-center">\
+                                        <div className="w-1 h-3 bg-red-600"></div>\
+                                    </div>\
+                                    <span className="font-mono font-bold text-lg">\{formatTime(timeLeft)\}</span>\
+                                </div>\
+                            </div>\
+                            <div className="flex justify-between items-center text-sm text-gray-600 mb-2">\
+                                <span>\uc0\u21839 \u38988  \{currentQuestion + 1\} / \{questions.length\}</span>\
+                                <span>\{sections[currentSection].name\}</span>\
+                            </div>\
+                            <div className="w-full bg-gray-200 rounded-full h-2">\
+                                <div \
+                                    className="bg-indigo-600 h-2 rounded-full transition-all duration-300" \
+                                    style=\{\{ width: `$\{progress\}%` \}\}\
+                                />\
+                            </div>\
+                        </div>\
+                    </div>\
+\
+                    <div className="max-w-4xl mx-auto px-4 py-8">\
+                        <div className="bg-white rounded-2xl shadow-lg p-8">\
+                            <div className="mb-8">\
+                                <h2 className="text-xl font-semibold text-gray-900 mb-4 whitespace-pre-line">\
+                                    \{currentQ.question\}\
+                                </h2>\
+                                \
+                                <div className="space-y-3">\
+                                    \{currentQ.options.map((option, index) => (\
+                                        <label\
+                                            key=\{index\}\
+                                            className=\{`flex items-center p-4 rounded-lg border-2 cursor-pointer transition-all $\{\
+                                                answers[currentQuestion] === index\
+                                                    ? 'border-indigo-500 bg-indigo-50'\
+                                                    : 'border-gray-200 hover:border-gray-300'\
+                                            \}`\}\
+                                        >\
+                                            <input\
+                                                type="radio"\
+                                                name=\{`question-$\{currentQuestion\}`\}\
+                                                value=\{index\}\
+                                                checked=\{answers[currentQuestion] === index\}\
+                                                onChange=\{() => handleAnswerSelect(index)\}\
+                                                className="w-5 h-5 text-indigo-600 mr-4"\
+                                            />\
+                                            <span className="text-gray-900">\{option\}</span>\
+                                        </label>\
+                                    ))\}\
+                                </div>\
+                            </div>\
+\
+                            <div className="flex justify-between">\
+                                <button\
+                                    onClick=\{handlePrevious\}\
+                                    disabled=\{currentQuestion === 0\}\
+                                    className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"\
+                                >\
+                                    \uc0\u21069 \u12398 \u21839 \u38988 \
+                                </button>\
+                                \
+                                <button\
+                                    onClick=\{handleNext\}\
+                                    className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"\
+                                >\
+                                    \{currentQuestion === questions.length - 1 ? '\uc0\u12486 \u12473 \u12488 \u23436 \u20102 ' : '\u27425 \u12398 \u21839 \u38988 '\}\
+                                </button>\
+                            </div>\
+                        </div>\
+                    </div>\
+                </div>\
+            );\
+        \};\
+\
+        ReactDOM.render(<HayniRecruitmentTest />, document.getElementById('root'));\
+    </script>\
+</body>\
+</html>}
